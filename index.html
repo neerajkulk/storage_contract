@@ -11,59 +11,81 @@
       integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+      integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+      crossorigin="anonymous"
+    />
 
     <title>Storage Smart Contract</title>
   </head>
   <body>
     <div class="container my-5">
       <h1>Storage Smart Contract</h1>
+      <h4 class="lead">- Store your favorite number on the blockchain</h4>
       <div class="connect my-5">
+        <h6 class="mt-5">Step 1 - Connect metmask to enable Etherem</h6>
         <button
           onclick="enableEthereum()"
           type="button"
           class="btn btn-success"
         >
-          Enable Ethereum
+          Enable Ethereum <i class="fab fa-ethereum"></i>
         </button>
-
+        <h6 class="mt-5">Step 2 - Retrieve your metamask wallets</h6>
         <button
           onclick="retrieveAccounts()"
           type="button"
           class="btn btn-success"
         >
-          Get accounts
+          Get accounts <i class="fas fa-wallet"></i>
         </button>
-
-        <h4>Success!</h4>
-        <p>The following accounts have been connected with metmask</p>
-        <ul id="acc0"></ul>
+        <div id="display-accounts" hidden>
+          <p class="my-3">
+            The following wallets have been connected with metmask:
+          </p>
+          <ul id="accounts"></ul>
+        </div>
       </div>
+      <h6 class="mt-5">Step 3</h6>
+      <p class="lead">Send transactions to store numbers on the blockchain</p>
 
       <div class="row g-3">
         <div class="col-auto">
-          <label class="">Enter Number to store</label>
-          <input type="text" readonly class="form-control-plaintext" />
-        </div>
-        <div class="col-auto">
-          <label class="visually-hidden">Password</label>
           <input
             class="form-control"
             id="storeinpt"
-            placeholder="your favorite number"
+            placeholder="Your favorite number"
           />
         </div>
         <div class="col-auto">
           <button onclick="setVal()" class="btn btn-primary mb-3">
             Store value
           </button>
+          <button
+            id="spinner"
+            class="btn btn-primary-outline"
+            type="button"
+            disabled
+            hidden
+          >
+            <span
+              class="spinner-border"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Validating transaction
+          </button>
         </div>
       </div>
 
-      <button onclick="getVal()" type="button" class="btn btn-success">
-        Get value
-      </button>
+      <pre id="tx"></pre>
 
-      <p id="current-val">30</p>
+      <button onclick="getVal()" type="button" class="btn btn-success">
+        Retrieve Value
+      </button>
+      <h3 style="display: inline-block" class="mt-3" id="current-val">0</h3>
     </div>
 
     <script>
@@ -88,22 +110,44 @@
       let accounts = [];
 
       async function enableEthereum() {
+        if (window.ethereum === undefined) {
+          alert("Please install metamask first");
+          return;
+        }
         ethereum.request({ method: "eth_requestAccounts" });
       }
+
       async function retrieveAccounts() {
         accounts = await web3.eth.getAccounts();
-        document.getElementById("acc0").innerText = accounts[0];
-        console.log(accounts);
+        if (accounts.length == 0) {
+          alert("No accounts found. Please enable Ethereum first");
+          return;
+        }
+        accountsHTML = accounts.map((acc) => {
+          return `<li>${acc}</li>`;
+        });
+        document.getElementById("accounts").innerHTML = accountsHTML;
+        document.getElementById("display-accounts").hidden = false;
       }
 
       const web3 = new Web3(ethereum);
       const contract = new web3.eth.Contract(ABI, contractAddress);
 
       async function setVal() {
-        let val = document.getElementById("storeinpt").innerText;
-        val = Number(val);
-        const tx = await contract.methods.store(20).send({ from: accounts[0] });
-        console.log(tx);
+        if (accounts.length == 0) {
+          alert("Please get accounts first");
+          return;
+        }
+        let val = document.getElementById("storeinpt").value;
+        console.log(val);
+        val = parseInt(val);
+        document.getElementById("spinner").hidden = false;
+        const tx = await contract.methods
+          .store(val)
+          .send({ from: accounts[0] });
+        document.getElementById("tx").innerText = JSON.stringify(tx, null, 4);
+        document.getElementById("spinner").hidden = true;
+
         return tx;
       }
 
