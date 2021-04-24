@@ -81,6 +81,9 @@
       </div>
 
       <pre id="tx"></pre>
+      <p id="etherscan" hidden>
+        View transaction on <a id="etherscan-link" href="">Etherscan</a>
+      </p>
 
       <button onclick="getVal()" type="button" class="btn btn-success">
         Retrieve Value
@@ -146,7 +149,11 @@
           .store(val)
           .send({ from: accounts[0] });
         document.getElementById("tx").innerText = JSON.stringify(tx, null, 4);
+
         document.getElementById("spinner").hidden = true;
+        const etherscanUrl = `https://rinkeby.etherscan.io/tx/${tx.transactionHash}`;
+        document.getElementById("etherscan-link").href = etherscanUrl;
+        document.getElementById("etherscan").hidden = false;
 
         return tx;
       }
