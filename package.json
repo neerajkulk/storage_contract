@@ -1,0 +1,25 @@
+{
+  "name": "storage_contract",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neerajkulk/storage_contract.git"
+  },
+  "author": "Neeraj Kulkarni",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neerajkulk/storage_contract/issues"
+  },
+  "homepage": "https://github.com/neerajkulk/storage_contract#readme",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.3.0",
+    "ganache-cli": "^6.12.2",
+    "solc": "^0.8.4",
+    "web3": "^1.3.5"
+  }
+}
