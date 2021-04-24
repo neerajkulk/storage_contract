@@ -15,12 +15,57 @@
     <title>Storage Smart Contract</title>
   </head>
   <body>
-    <div class="container">
+    <div class="container my-5">
       <h1>Storage Smart Contract</h1>
-      <button onclick="enableEthereum()" type="button" class="btn btn-success">
-        Enable Ethereum
+      <div class="connect my-5">
+        <button
+          onclick="enableEthereum()"
+          type="button"
+          class="btn btn-success"
+        >
+          Enable Ethereum
+        </button>
+
+        <button
+          onclick="retrieveAccounts()"
+          type="button"
+          class="btn btn-success"
+        >
+          Get accounts
+        </button>
+
+        <h4>Success!</h4>
+        <p>The following accounts have been connected with metmask</p>
+        <ul id="acc0"></ul>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-auto">
+          <label class="">Enter Number to store</label>
+          <input type="text" readonly class="form-control-plaintext" />
+        </div>
+        <div class="col-auto">
+          <label class="visually-hidden">Password</label>
+          <input
+            class="form-control"
+            id="storeinpt"
+            placeholder="your favorite number"
+          />
+        </div>
+        <div class="col-auto">
+          <button onclick="setVal()" class="btn btn-primary mb-3">
+            Store value
+          </button>
+        </div>
+      </div>
+
+      <button onclick="getVal()" type="button" class="btn btn-success">
+        Get value
       </button>
+
+      <p id="current-val">30</p>
     </div>
+
     <script>
       const ABI = [
         {
@@ -44,23 +89,28 @@
 
       async function enableEthereum() {
         ethereum.request({ method: "eth_requestAccounts" });
+      }
+      async function retrieveAccounts() {
         accounts = await web3.eth.getAccounts();
+        document.getElementById("acc0").innerText = accounts[0];
         console.log(accounts);
       }
 
       const web3 = new Web3(ethereum);
       const contract = new web3.eth.Contract(ABI, contractAddress);
 
-      async function setVal(val) {
-        const number = await contract.methods
-          .store(val)
-          .send({ from: accounts[0] });
-        console.log(number);
+      async function setVal() {
+        let val = document.getElementById("storeinpt").innerText;
+        val = Number(val);
+        const tx = await contract.methods.store(20).send({ from: accounts[0] });
+        console.log(tx);
+        return tx;
       }
 
       async function getVal() {
         const number = await contract.methods.retrieve().call();
-        console.log(number);
+        const currentValue = document.getElementById("current-val");
+        currentValue.innerText = number;
       }
     </script>
   </body>
